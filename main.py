@@ -325,4 +325,4 @@ def handle_message(password, conversation):
 
 if __name__ == "__main__":
     threading.Thread(target=clean_up).start()
-    app.run(host=default_host, port=os.getenv("PORT") if os.getenv("PORT") else default_port)
+    app.run(host=os.getenv("HOST") if os.getenv("HOST") else default_host, port=os.getenv("PORT") if os.getenv("PORT") else default_port)
