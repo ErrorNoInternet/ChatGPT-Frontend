@@ -193,7 +193,7 @@ def pop_message(password, conversation, location, count):
         tokens = count_tokens(conversations[conversation]["last_model"], messages)
 
         conversations_lock.acquire()
-        conversations[conversation]["tokens"] = tokens
+        conversations[conversation]["token_count"] = tokens
         conversations_lock.release()
     except:
         pass
@@ -241,9 +241,15 @@ def display_debug_information(password, conversation):
         <br>
         <b>Approximate Token Count:</b> {}
         <br>
+        <b>Last Token Count:</b> {}
+        <br>
+        <b>Last API Request:</b> {}
+        <br>
+        <b>Last API Response:</b> {}
+        <br>
         <b>Last Updated:</b> {}
         <br>
-        <b>Conversation Data Usage:</b> {:,} bytes
+        <b>Conversation Size:</b> {:,} bytes
         <br>
         <b>Conversation Data:</b> {}
     </p>
@@ -256,7 +262,10 @@ def display_debug_information(password, conversation):
             len(list(filter(lambda message: message["role"] == "assistant", conversations[conversation]["messages"]))),
             len(list(filter(lambda message: message["role"] == "error", conversations[conversation]["messages"]))),
             conversations[conversation]["last_model"],
-            conversations[conversation]["tokens"],
+            conversations[conversation]["token_count"],
+            conversations[conversation]["last_token_count"],
+            conversations[conversation]["last_api_request"],
+            conversations[conversation]["last_api_response"],
             conversations[conversation]["last_updated"],
             len(str(conversations[conversation])),
             str(conversations[conversation]).encode()
@@ -294,14 +303,19 @@ def handle_message(password, conversation):
         conversations[conversation] = {
             "last_updated": time.time(),
             "last_model": model,
-            "tokens": 0,
+            "last_api_request": {},
+            "last_api_response": b"",
+            "last_token_count": 0,
+            "token_count": 0,
             "messages": []
         }
+    tokens = count_tokens(model, user_input)
     conversations[conversation]["messages"].append({
         "role": flask.request.form.get("role").strip(),
         "content": user_input
     })
-    conversations[conversation]["tokens"] += count_tokens(model, user_input)
+    conversations[conversation]["last_token_count"] = tokens
+    conversations[conversation]["token_count"] += tokens
     conversations[conversation]["last_model"] = model
     conversations[conversation]["last_updated"] = time.time()
     conversations_lock.release()
@@ -319,11 +333,18 @@ def handle_message(password, conversation):
         if not success:
             try:
                 print(f"Making API request for conversation {conversation} (attempt {i+1}/{api_ratelimit_retry_count})...")
-                response = requests.post(api_url, json={
+                request_json = {
                     "model": model,
                     "temperature": temperature,
                     "messages": filtered_messages,
-                })
+                }
+                conversations_lock.acquire()
+                conversations[conversation]["last_api_request"] = request_json
+                conversations_lock.release()
+                response = make_request(request_json)
+                conversations_lock.acquire()
+                conversations[conversation]["last_api_response"] = response.bytes
+                conversations_lock.release()
             except Exception as error:
                 conversations_lock.acquire()
                 conversations[conversation]["messages"].append({
@@ -364,9 +385,11 @@ def handle_message(password, conversation):
         conversations_lock.release()
         print(f"Conversation {conversation} ran into a JSON error: {error}. Status: {response.status_code}, Text: {response.text}.")
         return flask.redirect(f"/{password}/{conversation}")
+    tokens = count_tokens(model, message["content"])
     conversations_lock.acquire()
     conversations[conversation]["messages"].append(message)
-    conversations[conversation]["tokens"] += count_tokens(model, message["content"])
+    conversations[conversation]["last_token_count"] = tokens
+    conversations[conversation]["token_count"] += tokens
     conversations[conversation]["last_updated"] = time.time()
     conversations_lock.release()
 
