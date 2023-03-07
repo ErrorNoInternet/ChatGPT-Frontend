@@ -49,6 +49,12 @@ def clean_up():
                 del conversations[conversation]
         conversations_lock.release()
 
+        conversations_lock.acquire()
+        for conversation in conversations.copy():
+            while len(conversations[conversation]["messages"]) > 500:
+                conversations[conversation]["messages"].pop(0)
+        conversations_lock.release()
+
 @app.before_request
 def request_handler():
     request_ip = flask.request.remote_addr
