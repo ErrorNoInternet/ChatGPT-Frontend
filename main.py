@@ -248,15 +248,15 @@ def display_debug_information(password, conversation):
         <br>
         <b>Total Error Messages:</b> {}
         <br>
-        <b>Last Used Model:</b> {}</b>
-        <br>
         <b>Total Token Count:</b> {}
         <br>
-        <b>Last Token Count:</b> {}
+        <b>Last Message Token Count:</b> {}
         <br>
         <b>Last API Request:</b> {}
         <br>
         <b>Last API Response:</b> {}
+        <br>
+        <b>Last Used Model:</b> {}</b>
         <br>
         <b>Last Updated:</b> {}
         <br>
@@ -273,11 +273,11 @@ def display_debug_information(password, conversation):
             len(list(filter(lambda message: message["role"] == "system", conversations[conversation]["messages"]))),
             len(list(filter(lambda message: message["role"] == "assistant", conversations[conversation]["messages"]))),
             len(list(filter(lambda message: message["role"] == "error", conversations[conversation]["messages"]))),
-            conversations[conversation]["last_model"],
             conversations[conversation]["token_count"],
             conversations[conversation]["last_token_count"],
             conversations[conversation]["last_api_request"],
             conversations[conversation]["last_api_response"],
+            conversations[conversation]["last_model"],
             conversations[conversation]["last_updated"],
             len(str(conversations[conversation])),
             str(conversations[conversation]).encode()
