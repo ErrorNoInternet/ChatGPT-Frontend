@@ -184,12 +184,26 @@ def pop_message(password, conversation, location, count):
     conversations_lock.release()
 
     try:
+        messages = conversations[conversation]["messages"]
+        if len(messages) == 0:
+            conversations_lock.acquire()
+            conversations[conversation]["last_token_count"] = 0
+            conversations[conversation]["token_count"] = 0
+            conversations_lock.release()
+            return flask.redirect(f"/{password}/{conversation}")
+
+        last_tokens = count_tokens(
+            conversations[conversation]["last_model"],
+            list(reversed(messages))[0]["content"]
+        )
+
         messages = ""
         for message in conversations[conversation]["messages"]:
             messages += message["content"]
         tokens = count_tokens(conversations[conversation]["last_model"], messages)
 
         conversations_lock.acquire()
+        conversations[conversation]["last_token_count"] = last_tokens
         conversations[conversation]["token_count"] = tokens
         conversations_lock.release()
     except:
@@ -236,7 +250,7 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last Used Model:</b> {}</b>
         <br>
-        <b>Approximate Token Count:</b> {}
+        <b>Total Token Count:</b> {}
         <br>
         <b>Last Token Count:</b> {}
         <br>
