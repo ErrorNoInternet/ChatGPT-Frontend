@@ -261,6 +261,7 @@ def handle_message(password, conversation):
         "content": user_input
     })
     conversations[conversation]["tokens"] += count_tokens(model, user_input)
+    conversations[conversation]["last_model"] = model
     conversations[conversation]["last_updated"] = time.time()
     conversations_lock.release()
 
