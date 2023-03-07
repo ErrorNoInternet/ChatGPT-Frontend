@@ -260,6 +260,7 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last Updated:</b> {}
         <br>
+        <br>
         <b>Conversation Size:</b> {:,} bytes
         <br>
         <b>Conversation Data:</b> {}
@@ -354,7 +355,7 @@ def handle_message(password, conversation):
                 conversations_lock.release()
                 response = make_request(request_json)
                 conversations_lock.acquire()
-                conversations[conversation]["last_api_response"] = response.bytes
+                conversations[conversation]["last_api_response"] = f"Status: {response.status_code}, Text: {response.text}"
                 conversations_lock.release()
             except Exception as error:
                 conversations_lock.acquire()
