@@ -245,7 +245,7 @@ def handle_message(password, conversation):
 
     model = flask.request.form.get("model").strip()
     user_input = flask.request.form.get("content").strip()
-    if len(user_input) == 0 or len(user_input) > 5000:
+    if len(user_input) == 0 or len(user_input) > 20000:
         return flask.redirect(f"/{password}/{conversation}")
 
     conversations_lock.acquire()
