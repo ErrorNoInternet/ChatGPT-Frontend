@@ -323,7 +323,7 @@ def handle_message(password, conversation):
                 print(f"Conversation {conversation} ran into a request error: {error}")
                 return flask.redirect(f"/{password}/{conversation}")
             if response.status_code == 429:
-                print(f"Conversation {conversation} is temporarily ratelimited! Retrying in {api_ratelimit_retry_wait} second(s)...")
+                print(f"Conversation {conversation} is temporarily ratelimited! Waiting for {api_ratelimit_retry_wait} second(s)...")
                 time.sleep(api_ratelimit_retry_wait)
                 continue
             else:
