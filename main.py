@@ -169,6 +169,8 @@ def pop_message(password, conversation, location, count):
         return flask.redirect(f"/{password}/{conversation}")
     try:
         count = int(count)
+        if count > 50:
+            count = 50
     except:
         return flask.redirect(f"/{password}/{conversation}")
 
