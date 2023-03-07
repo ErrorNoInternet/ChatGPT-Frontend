@@ -7,17 +7,16 @@ import requests
 import threading
 import ipaddress
 
-# Your own API key
-# api_url = "https://api.openai.com/completions"
-# make_request = lambda json: requests.post(
-#     api_url,
-#     headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
-#     json=json
-# )
-
-# Free API
 api_url = "https://chatgpt-api.shn.hk/v1/"
 make_request = lambda json: requests.post(api_url, json=json)
+
+if os.getenv("OPENAI_API_KEY"):
+    api_url = "https://api.openai.com/completions"
+    make_request = lambda json: requests.post(
+        api_url,
+        headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
+        json=json
+    )
 
 api_ratelimit_retry_count = 8
 api_ratelimit_retry_wait = 3
