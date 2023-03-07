@@ -7,11 +7,22 @@ import requests
 import threading
 import ipaddress
 
-default_host = "0.0.0.0"
-default_port = 8080
+# Your own API key
+# api_url = "https://api.openai.com/completions"
+# make_request = lambda json: requests.post(
+#     api_url,
+#     headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
+#     json=json
+# )
+
+# Free API
 api_url = "https://chatgpt-api.shn.hk/v1/"
+make_request = lambda json: requests.post(api_url, json=json)
+
 api_ratelimit_retry_count = 8
 api_ratelimit_retry_wait = 3
+default_host = "0.0.0.0"
+default_port = 8080
 conversation_dormant_time = 43200
 endpoint_ratelimits = {"general": 0.5, "debug": 1, "api": 5}
 
