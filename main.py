@@ -11,6 +11,7 @@ api_url = "https://chatgpt-api.shn.hk/v1/"
 make_request = lambda json: requests.post(api_url, json=json)
 
 if os.getenv("OPENAI_API_KEY"):
+    print("Using specified OpenAI API key!")
     api_url = "https://api.openai.com/completions"
     make_request = lambda json: requests.post(
         api_url,
