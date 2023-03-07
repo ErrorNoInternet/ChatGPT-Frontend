@@ -140,7 +140,7 @@ def display_messages(password, conversation):
     <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/5"><button type="submit">Pop x5 (down)</button></form>
     <br>
 
-    <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Clear All Messages</button></form>
+    <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Reset Conversation</button></form>
     <form class="inline-element" action="/{password}/{conversation}/debug"><button type="submit">Debug Information</button></form>
     <hr>""".format(password=password, conversation=conversation)
 
