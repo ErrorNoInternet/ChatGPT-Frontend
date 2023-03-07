@@ -136,10 +136,10 @@ def display_messages(password, conversation):
         <input type="range" style="width: 250px;" min="0" max="2" step="0.1" name="temperature" id="temperature">
     </form>
 
-    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/1"><button type="submit">Pop (last)</button></form>
-    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/1"><button type="submit">Pop (first)</button></form>
-    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/5"><button type="submit">Pop x5 (last)</button></form>
-    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/5"><button type="submit">Pop x5 (first)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/1"><button type="submit">Pop (up)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/1"><button type="submit">Pop (down)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/5"><button type="submit">Pop x5 (up)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/5"><button type="submit">Pop x5 (down)</button></form>
     <br>
 
     <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Clear All Messages</button></form>
