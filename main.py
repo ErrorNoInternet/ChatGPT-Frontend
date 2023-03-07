@@ -232,9 +232,9 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last Updated:</b> {}
         <br>
-        <b>Memory Usage:</b> {:,} bytes
+        <b>Conversation Data Usage:</b> {:,} bytes
         <br>
-        <b>Memory Dump:</b> {}
+        <b>Conversation Data:</b> {}
     </p>
 </body>""".format(
             password,
