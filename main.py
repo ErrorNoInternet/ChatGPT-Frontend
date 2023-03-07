@@ -125,7 +125,7 @@ def display_messages(password, conversation):
         <br>
 
         <label for="temperature">Temperature</label>
-        <input type="range" min="0" max="2" step="0.1" name="temperature" id="temperature" width="100">
+        <input type="range" style="width: 250px;" min="0" max="2" step="0.1" name="temperature" id="temperature">
     </form>
 
     <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/1"><button type="submit">Pop (last)</button></form>
@@ -267,8 +267,12 @@ def handle_message(password, conversation):
     if password != os.getenv("PASSWORD"):
         return default_response
 
-    print(flask.request.form.get("temperature"))
-
+    try:
+        temperature = int(flask.request.form.get("temperature"))
+        if temperature < 0 or temperature > 2:
+            return flask.redirect(f"/{password}/{conversation}")
+    except:
+        return flask.redirect(f"/{password}/{conversation}")
     model = flask.request.form.get("model").strip()
     user_input = flask.request.form.get("content").strip()
     if len(user_input) == 0 or len(user_input) > 20000:
@@ -305,7 +309,8 @@ def handle_message(password, conversation):
             try:
                 print(f"Making API request for conversation {conversation} (attempt {i+1}/{api_ratelimit_retry_count})...")
                 response = requests.post(api_url, json={
-                    "model": flask.request.form.get("model"),
+                    "model": model,
+                    "temperature": temperature,
                     "messages": filtered_messages,
                 })
             except Exception as error:
