@@ -24,7 +24,8 @@ ratelimits_lock = threading.Lock()
 if not os.getenv("PASSWORD"):
     print("No PASSWORD environment variable found!")
     exit()
-default_response = "<h2>Hello, world!</h2>"
+default_html = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+default_response = default_html + "<h2>Hello, world!</h2>"
 
 def count_tokens(model, text):
     try:
@@ -76,7 +77,7 @@ def request_handler():
         ratelimits[request_fingerprint] = 0
     if time.time() - ratelimits[request_fingerprint] < endpoint_ratelimits[endpoint]:
         ratelimits_lock.release()
-        return "<p><b>Slow down!</b> You're sending too many requests!</p>"
+        return default_html + "<p><b>Slow down!</b> You're sending too many requests!</p>"
     ratelimits[request_fingerprint] = time.time()
     ratelimits_lock.release()
 
@@ -89,12 +90,14 @@ def display_messages(password, conversation):
     if password != os.getenv("PASSWORD"):
         return default_response
 
-    response = """<title>ChatGPT</title>
+    response = default_html + """<title>ChatGPT</title>
 
 <style>
+    textarea {{ vertical-align: top; }}
     h3 {{ margin-bottom: 5px; }}
     pre {{ white-space: pre-wrap; word-wrap: break-word; margin-top: 0px; }}
-    textarea {{ vertical-align: top; }}
+    .inline-element {{ display: inline-block; }}
+    .top-element {{ margin-bottom: 1px; }}
 </style>
 
 <body>
@@ -120,11 +123,19 @@ def display_messages(password, conversation):
             <option value="gpt-3.5-turbo-0301">GPT-3.5 Turbo (March 2023)</option>
         </select>
         <br>
+
+        <label for="temperature">Temperature</label>
+        <input type="range" min="0" max="2" step="0.1" name="temperature" id="temperature" width="100">
     </form>
 
-    <form style="display: inline-block;" action="/{password}/{conversation}/pop"><button type="submit">Pop Message</button></form>
-    <form style="display: inline-block;" action="/{password}/{conversation}/clear"><button type="submit">Clear Messages</button></form>
-    <form style="display: inline-block;" action="/{password}/{conversation}/debug"><button type="submit">Debug Information</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/1"><button type="submit">Pop (last)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/1"><button type="submit">Pop (first)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/top/5"><button type="submit">Pop x5 (last)</button></form>
+    <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/5"><button type="submit">Pop x5 (first)</button></form>
+    <br>
+
+    <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Clear All Messages</button></form>
+    <form class="inline-element" action="/{password}/{conversation}/debug"><button type="submit">Debug Information</button></form>
     <hr>""".format(password=password, conversation=conversation)
 
     if conversation in conversations:
@@ -140,28 +151,41 @@ def display_messages(password, conversation):
 
     return response + "\n</body>"
 
-@app.route("/<password>/<conversation>/pop")
-def pop_message(password, conversation):
+@app.route("/<password>/<conversation>/pop/<location>/<count>")
+def pop_message(password, conversation, location, count):
     time.sleep(0.5)
     if password != os.getenv("PASSWORD"):
         return default_response
 
-    conversations_lock.acquire()
-    try:
-        conversations[conversation]["messages"].pop(0)
-    except:
-        conversations_lock.release()
+    if location not in ["top", "bottom"]:
         return flask.redirect(f"/{password}/{conversation}")
-    conversations_lock.release()
-
-    messages = ""
-    for message in conversations[conversation]["messages"]:
-        messages += message["content"]
-    tokens = count_tokens(conversations[conversation]["last_model"], messages)
+    try:
+        count = int(count)
+    except:
+        return flask.redirect(f"/{password}/{conversation}")
 
     conversations_lock.acquire()
-    conversations[conversation]["tokens"] = tokens
+    for _ in range(count):
+        try:
+            if location == "top":
+                conversations[conversation]["messages"].pop()
+            else:
+                conversations[conversation]["messages"].pop(0)
+        except:
+            pass
     conversations_lock.release()
+
+    try:
+        messages = ""
+        for message in conversations[conversation]["messages"]:
+            messages += message["content"]
+        tokens = count_tokens(conversations[conversation]["last_model"], messages)
+
+        conversations_lock.acquire()
+        conversations[conversation]["tokens"] = tokens
+        conversations_lock.release()
+    except:
+        pass
 
     return flask.redirect(f"/{password}/{conversation}")
 
@@ -186,7 +210,7 @@ def display_debug_information(password, conversation):
         return default_response
 
     try:
-        response = """<title>Debug Information</title>
+        response = default_html + """<title>Debug Information</title>
 
 <body>
     <form style="display: inline-block;" action="/{}/{}"><button type="submit">Back</button></form>
@@ -227,14 +251,14 @@ def display_debug_information(password, conversation):
             str(conversations[conversation]).encode()
         )
     except:
-        response = """<title>Debug Information</title>
+        response = default_html + """<title>Debug Information</title>
 
 <body>
     <form action="/{password}/{conversation}"><button type="submit">Back</button></form>
 
     <p>No debug information found!</p>
 </body>""".format(password=password, conversation=conversation)
-    
+
     return response
 
 @app.route("/<password>/<conversation>/message", methods=["POST"])
@@ -242,6 +266,8 @@ def handle_message(password, conversation):
     time.sleep(0.5)
     if password != os.getenv("PASSWORD"):
         return default_response
+
+    print(flask.request.form.get("temperature"))
 
     model = flask.request.form.get("model").strip()
     user_input = flask.request.form.get("content").strip()
