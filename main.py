@@ -300,8 +300,8 @@ def handle_message(password, conversation):
         return default_response
 
     try:
-        temperature = int(flask.request.form.get("temperature"))
-        if temperature < 0 or temperature > 2:
+        temperature = float(flask.request.form.get("temperature"))
+        if temperature < 0.0 or temperature > 2.0:
             return flask.redirect(f"/{password}/{conversation}")
     except:
         return flask.redirect(f"/{password}/{conversation}")
