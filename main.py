@@ -46,8 +46,6 @@ def html_formatted(content):
     return content.strip()
 
 def clean_up():
-    print("Started clean_up thread...")
-
     while True:
         time.sleep(300)
 
