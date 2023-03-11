@@ -142,18 +142,19 @@ def display_messages(password, conversation):
 
     <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Reset Conversation</button></form>
     <form class="inline-element" action="/{password}/{conversation}/debug"><button type="submit">Debug Information</button></form>
-    <hr>""".format(password=password, conversation=conversation)
+    <hr>
+""".format(password=password, conversation=conversation)
 
     if conversation in conversations:
         for message in reversed(conversations[conversation]["messages"]):
             if message["role"] == "user":
-                response += f"<h3><b>User:</b></h3><pre>{html_formatted(message['content'])}</pre>"
+                response += f"\n    <h3><b>User:</b></h3><pre>{html_formatted(message['content'])}</pre>"
             elif message["role"] == "system":
-                response += f"<h3><b>System:</b></h3><pre>{html_formatted(message['content'])}</pre>"
+                response += f"\n    <h3><b>System:</b></h3><pre>{html_formatted(message['content'])}</pre>"
             elif message["role"] == "assistant":
-                response += f"<h3><b>ChatGPT:</b></h3><pre>{html_formatted(message['content'])}</pre>"
+                response += f"\n    <h3><b>ChatGPT:</b></h3><pre>{html_formatted(message['content'])}</pre>"
             elif message["role"] == "error":
-                response += f"<h3><b>OpenAI (error):</b></h3><pre>{html_formatted(message['content'])}</pre>"
+                response += f"\n    <h3><b>OpenAI (error):</b></h3><pre>{html_formatted(message['content'])}</pre>"
 
     return response + "\n</body>"
 
