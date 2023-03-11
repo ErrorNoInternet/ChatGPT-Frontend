@@ -253,14 +253,15 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last Message Token Count:</b> {}
         <br>
+        <b>Last Used Model:</b> {}</b>
+        <br>
+        <b>Last API Retry Attempts:</b> {}
+        <br>
         <b>Last API Request:</b> {}
         <br>
         <b>Last API Response:</b> {}
         <br>
-        <b>Last Used Model:</b> {}</b>
-        <br>
         <b>Last Updated:</b> {}
-        <br>
         <br>
         <b>Conversation Size:</b> {:,} bytes
         <br>
@@ -276,9 +277,10 @@ def display_debug_information(password, conversation):
             len(list(filter(lambda message: message["role"] == "error", conversations[conversation]["messages"]))),
             conversations[conversation]["token_count"],
             conversations[conversation]["last_token_count"],
+            conversations[conversation]["last_model"],
+            conversations[conversation]["last_api_retry_attempts"],
             conversations[conversation]["last_api_request"],
             conversations[conversation]["last_api_response"],
-            conversations[conversation]["last_model"],
             conversations[conversation]["last_updated"],
             len(str(conversations[conversation])),
             str(conversations[conversation]).encode()
@@ -316,10 +318,11 @@ def handle_message(password, conversation):
         conversations[conversation] = {
             "last_updated": time.time(),
             "last_model": model,
-            "last_api_request": {},
-            "last_api_response": b"",
             "last_token_count": 0,
             "token_count": 0,
+            "last_api_retry_attempts": 0,
+            "last_api_request": {},
+            "last_api_response": b"",
             "messages": []
         }
     tokens = count_tokens(model, user_input)
@@ -343,6 +346,9 @@ def handle_message(password, conversation):
 
     success = False
     for i in range(api_ratelimit_retry_count):
+        conversations_lock.acquire()
+        conversations[conversation]["last_api_retry_attempts"] = i + 1
+        conversations_lock.release()
         if not success:
             try:
                 print(f"Making API request for conversation {conversation} (attempt {i+1}/{api_ratelimit_retry_count})...")
