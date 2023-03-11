@@ -140,7 +140,7 @@ def display_messages(password, conversation):
     <form class="inline-element top-element" action="/{password}/{conversation}/pop/bottom/5"><button type="submit">Pop x5 (down)</button></form>
     <br>
 
-    <form class="inline-element" action="/{password}/{conversation}/clear"><button type="submit">Reset Conversation</button></form>
+    <form class="inline-element" action="/{password}/{conversation}/confirm-clear"><button type="submit">Reset Conversation</button></form>
     <form class="inline-element" action="/{password}/{conversation}/debug"><button type="submit">Debug Information</button></form>
     <hr>
 """.format(password=password, conversation=conversation)
@@ -211,6 +211,22 @@ def pop_message(password, conversation, location, count):
         pass
 
     return flask.redirect(f"/{password}/{conversation}")
+
+@app.route("/<password>/<conversation>/confirm-clear")
+def confirm_clear_messages(password, conversation):
+    time.sleep(0.5)
+    if password != os.getenv("PASSWORD"):
+        return default_response
+
+    return default_html + """<title>Reset Conversation</title>
+
+<body>
+    <form action="/{password}/{conversation}"><button type="submit">Back</button></form>
+
+    <p style="margin-bottom: 0px;">Are you sure you want to reset this conversation?</p>
+    <form style="display: inline-block;" action="/{password}/{conversation}"><button type="submit">No, I am not sure</button></form>
+    <form style="display: inline-block;" action="/{password}/{conversation}/clear"><button type="submit">Yes, I am sure</button></form>
+</body>""".format(password=password, conversation=conversation)
 
 @app.route("/<password>/<conversation>/clear")
 def clear_messages(password, conversation):
