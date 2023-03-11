@@ -16,7 +16,7 @@ if os.getenv("OPENAI_API_KEY"):
         json=json
     )
 
-api_ratelimit_retry_count = 8
+api_ratelimit_retry_count = 10
 api_ratelimit_retry_wait = 3
 default_host = "0.0.0.0"
 default_port = 8080
