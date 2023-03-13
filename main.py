@@ -326,7 +326,7 @@ def handle_message(password, conversation):
         return flask.redirect(f"/{password}/{conversation}")
     model = flask.request.form.get("model").strip()
     user_input = flask.request.form.get("content").strip()
-    if len(user_input) == 0 or len(user_input) > 20000:
+    if len(user_input) > 20000:
         return flask.redirect(f"/{password}/{conversation}")
 
     conversations_lock.acquire()
@@ -342,10 +342,11 @@ def handle_message(password, conversation):
             "messages": []
         }
     tokens = count_tokens(model, user_input)
-    conversations[conversation]["messages"].append({
-        "role": flask.request.form.get("role").strip(),
-        "content": user_input
-    })
+    if len(user_input) > 0:
+        conversations[conversation]["messages"].append({
+            "role": flask.request.form.get("role").strip(),
+            "content": user_input
+        })
     conversations[conversation]["last_token_count"] = tokens
     conversations[conversation]["token_count"] += tokens
     conversations[conversation]["last_model"] = model
