@@ -397,6 +397,7 @@ def handle_message(password, conversation):
             else:
                 print(f"Successfully replied to conversation {conversation}!")
                 success = True
+                break
 
     try:
         json = response.json()
