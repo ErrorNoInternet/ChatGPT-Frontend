@@ -7,11 +7,14 @@ import requests
 import threading
 import ipaddress
 
-make_request = lambda json: requests.post("https://chatgpt-api.shn.hk/v1/", json=json)
+make_request = lambda json: requests.post("https://chatgpt-api.shn.hk/v1", json=json)
 if os.getenv("OPENAI_API_KEY"):
     print("Using specified OpenAI API key!")
+    url = "https://api.openai.com/v1/chat/completions"
+    if os.getenv("USE_OPENAI_PROXY"):
+        url = "https://openai.proxy.mailjob.net/v1/chat/completions"
     make_request = lambda json: requests.post(
-        "https://api.openai.com/v1/chat/completions",
+        url,
         headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
         json=json
     )
