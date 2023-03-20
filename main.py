@@ -398,7 +398,7 @@ def handle_message(password, conversation):
                 time.sleep(api_ratelimit_retry_wait)
                 continue
             else:
-                print(f"Successfully replied to conversation {conversation}!")
+                print(f"Successfully received API response for {conversation}!")
                 success = True
                 break
 
