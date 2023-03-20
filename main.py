@@ -12,6 +12,7 @@ if os.getenv("OPENAI_API_KEY"):
     print("Using specified OpenAI API key!")
     url = "https://api.openai.com/v1/chat/completions"
     if os.getenv("USE_OPENAI_API_PROXY"):
+        print("Using OpenAI API proxy!")
         url = "https://openai.proxy.mailjob.net/v1/chat/completions"
     make_request = lambda json: requests.post(
         url,
