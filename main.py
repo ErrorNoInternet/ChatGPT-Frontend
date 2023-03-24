@@ -275,7 +275,7 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last Used Model:</b> {}</b>
         <br>
-        <b>Last Request Retry Attempts:</b> {}
+        <b>Last API Request Attempts:</b> {}
         <br>
         <b>Last API Request:</b> {}
         <br>
