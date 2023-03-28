@@ -277,13 +277,13 @@ def display_debug_information(password, conversation):
         <br>
         <b>Last API Request Attempts:</b> {}
         <br>
-        <b>Last API Request:</b> {}
+        <b>Last API Request JSON:</b> {}
         <br>
         <b>Last API Response:</b> {}
         <br>
         <b>Last Updated:</b> {}
         <br>
-        <b>Conversation Size:</b> {:,} bytes
+        <b>Conversation Data Size:</b> {:,} bytes
         <br>
         <b>Conversation Data:</b> {}
     </p>
