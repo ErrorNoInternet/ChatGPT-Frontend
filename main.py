@@ -298,7 +298,7 @@ def display_debug_information(password, conversation):
             conversations[conversation]["token_count"],
             conversations[conversation]["last_token_count"],
             conversations[conversation]["last_model"],
-            conversations[conversation]["last_api_retry_attempts"],
+            conversations[conversation]["last_api_request_attempts"],
             conversations[conversation]["last_api_request"],
             conversations[conversation]["last_api_response"],
             conversations[conversation]["last_updated"],
@@ -340,7 +340,7 @@ def handle_message(password, conversation):
             "last_model": model,
             "last_token_count": 0,
             "token_count": 0,
-            "last_api_retry_attempts": 0,
+            "last_api_request_attempts": 0,
             "last_api_request": {},
             "last_api_response": b"",
             "messages": []
@@ -368,7 +368,7 @@ def handle_message(password, conversation):
     success = False
     for i in range(api_ratelimit_retry_count):
         conversations_lock.acquire()
-        conversations[conversation]["last_api_retry_attempts"] = i + 1
+        conversations[conversation]["last_api_request_attempts"] = i + 1
         conversations_lock.release()
         if not success:
             try:
