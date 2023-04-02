@@ -11,9 +11,9 @@ make_request = lambda json: requests.post("https://chatgpt-api.shn.hk/v1", json=
 if os.getenv("OPENAI_API_KEY"):
     print("Using specified OpenAI API key!")
     url = "https://api.openai.com/v1/chat/completions"
-    if os.getenv("USE_OPENAI_API_PROXY"):
+    if os.getenv("OPENAI_API_PROXY"):
         print("Using OpenAI API proxy!")
-        url = "https://openai.proxy.mailjob.net/v1/chat/completions"
+        url = os.getenv("OPENAI_API_PROXY")
     make_request = lambda json: requests.post(
         url,
         headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
