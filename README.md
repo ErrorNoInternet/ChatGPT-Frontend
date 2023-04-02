@@ -12,8 +12,8 @@ Designed to work on Kindles (and other old browsers) without any JavaScript.
   - Use your own API key if you don't want to use the free API
 - `OPENAI_API_ENDPOINT`
   - Supply a custom API endpoint if the official API is inaccessible
-- `HOST`
-- `PORT`
+- `HOST` (default `0.0.0.0`)
+- `PORT` (default `8080`)
 
 ```sh
 git clone https://github.com/ErrorNoInternet/ChatGPT-Frontend
@@ -21,5 +21,5 @@ cd ChatGPT-Frontend
 pip install -r requirements.txt
 PASSWORD=HelloWorld1234 python3 main.py
 
-# firefox http://localhost:8080/HelloWorld1234/Conversation0
+# xdg-open http://localhost:8080/HelloWorld1234/Conversation0
 ```
