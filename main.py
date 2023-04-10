@@ -417,7 +417,7 @@ def handle_message(password, conversation):
 
     try:
         message = json["choices"][0]["message"]
-    except:
+    except Exception as error:
         conversations_lock.acquire()
         conversations[conversation]["messages"].append({
             "role": "error",
